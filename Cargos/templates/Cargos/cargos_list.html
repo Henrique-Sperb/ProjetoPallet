@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Carregamentos</title>
+</head>
+<body>
+    <h1>Lista de Carregamentos</h1>
+    <ul>
+        {% for shipment in shipments %}
+            <li> {{ shipment.title }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

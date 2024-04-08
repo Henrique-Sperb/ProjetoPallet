@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CarregamentosConfig(AppConfig):
+class CargosConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "carregamentos"
+    name = "Cargos"
