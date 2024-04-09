@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+    {% if cargo.pk %}
+        Editar Carregamento
+    {% else %}
+        Novo Carregamento
+    {% endif %}
+{% endblock page_title %}
+
+{% block content %}
+<br>
+    <main class="container" style="box-shadow: 0 0 10px #000; text-shadow: 5px 5px 10px #00008a; width: 30%; margin: auto; border: 1px solid #000; border-radius: 2%; background-color: #74a4fd">
+        <br>
+        {% if cargo.pk %}
+            <h1 align="center">Editar Carregamento</h1>
+        {% else %}
+            <h1 align="center">Novo Carregamento</h1>
+        {% endif %}
+        <br>
+        <form class="row g-3">
+          {% csrf_token %}
+          <div class="col-md-6">
+            <label for="formGroupExampleInput1" class="form-label"><strong>Data de Envio</strong></label>
+            <input type="date" class="form-control" id="formGroupExampleInput1" style="box-shadow: 0 0 10px #000">
+          </div>
+          <div class="col-md-6">
+            <label for="formGroupExampleInput2" class="form-label"><strong>Data de Recebimento</strong></label>
+            <input type="date" class="form-control" id="formGroupExampleInput2" style="box-shadow: 0 0 10px #000">
+          </div>
+          <div class="col-md-6">
+            <label for="formGroupExampleInput3" class="form-label"><strong>Empresa de Origem</strong></label>
+            <select id="formGroupExampleInput3" class="form-select" style="box-shadow: 0 0 10px #000">
+              <option selected>Escolha uma Empresa</option>
+              <option>Reiter</option>
+              <option>Embarcadora</option>
+              <option>Cliente Final</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="formGroupExampleInput4" class="form-label"><strong>Empresa de Origem</strong></label>
+            <select id="formGroupExampleInput4" class="form-select" style="box-shadow: 0 0 10px #000">
+              <option selected>Escolha uma Empresa</option>
+              <option>Reiter</option>
+              <option>Embarcadora</option>
+              <option>Cliente Final</option>
+            </select>
+          </div>
+          <div class="col-md-12">
+            <label for="formGroupExampleInput6" class="form-label"><strong>Houve venda ou descarte de pallets?</strong></label>
+            <select id="formGroupExampleInput6" class="form-select" style="box-shadow: 0 0 10px #000">
+              <option selected>Não</option>
+              <option>Venda</option>
+              <option>Descarte</option>
+            </select>
+          </div>
+          <div class="col-12" align="right">
+            <a style="box-shadow: 0 0 10px #000" href="{% url 'cargo_update' pk=cargo.pk %}" class="btn btn-success btn">Editar</a>
+            <a style="box-shadow: 0 0 10px #000" href="{% url 'cargo_list' %}" class="btn btn-secondary btn">Voltar</a>
+          </div>
+        </form>
+        <br>
+    </main>
+{% endblock content %}

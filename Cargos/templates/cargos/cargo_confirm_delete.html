@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+    <h1>Excluir Carregamento</h1>
+{% endblock page_title %}
+
+{% block content %}
+    <h1>Excluir Carregamento</h1>
+    <br>
+    <h3>Tem certeza que deseja excluir o carregamento? Após excluir não é possível recuperar!</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Data Envio</th>
+          <th scope="col">Data de Recebimento</th>
+          <th scope="col">Empresa de Origem</th>
+          <th scope="col">Empresa de Destino</th>
+          <th scope="col">Quantidade de Pallets</th>
+          <th scope="col">Venda ou Descarte</th>
+          <th scope="col">Motorista</th>
+          <th scope="col">Número da Nota Fiscal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">{{ cargo.pk }}</th>
+          <td>{{ cargo.shipment_date }}</td>
+          <td>{{ cargo.unloading_date|default:"-" }}</td>
+          <td>{{ cargo.origin_company }}</td>
+          <td>{{ cargo.destination_company }}</td>
+          <td>{{ cargo.pallets_quantity }}</td>
+          <td>
+            {% if cargo.sale_or_disposal %}
+              Sim
+            {% else %}
+              Não
+            {% endif %}
+          </td>
+          <td>{{ cargo.driver }}</td>
+          <td>
+            {% if cargo.number_nf %}
+              {{ cargo.number_nf }}
+            {% else %}
+              Não informado
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-danger">Excluir</button>
+        <a href="{% url 'cargo_list' %}" class="btn btn-primary">Voltar</a>
+    </form>
+{% endblock content %}

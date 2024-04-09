@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block page_title %}
+  Lista de Carregamentos
+{% endblock page_title %}
+
+{% block content %}
+<br>
+<h1 align="center"><strong>Lista de Carregamentos</strong></h1>
+<br>
+<main class="container-fluid">
+  <table class="table table-striped table-hover">
+      <thead>
+        <tr align="center">
+          <th scope="col">ID</th>
+          <th scope="col">Data Envio</th>
+          <th scope="col">Data de Recebimento</th>
+          <th scope="col">Empresa de Origem</th>
+          <th scope="col">Empresa de Destino</th>
+          <th scope="col">Quantidade de Pallets</th>
+          <th scope="col">Venda ou Descarte</th>
+          <th scope="col">Motorista</th>
+          <th scope="col">Número da Nota Fiscal</th>
+          <th scope="col">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cargo in cargo_list %}
+          <tr align="center">
+          <th scope="row">{{ cargo.pk }}</th>
+          <td>{{ cargo.shipment_date }}</td>
+          <td>{{ cargo.unloading_date|default:"-" }}</td>
+          <td>{{ cargo.origin_company }}</td>
+          <td>{{ cargo.destination_company }}</td>
+          <td>{{ cargo.pallets_quantity }}</td>
+          <td>
+            {% if cargo.sale_or_disposal %}
+              Sim
+            {% else %}
+              Não
+            {% endif %}
+          </td>
+          <td>{{ cargo.driver }}</td>
+          <td>{{ cargo.number_nf }}</td>
+          <td>
+            <a href="{% url 'cargo_confirm' pk=cargo.pk %}" class="btn btn-primary btn-sm {% if cargo.unloading_date %}disabled{% endif %}">Confirmar</a>
+            <a href="{% url 'cargo_update' pk=cargo.pk %}" class="btn btn-secondary btn-sm">Editar</a>
+            <a href="{% url 'cargo_delete' pk=cargo.pk %}" class="btn btn-danger btn-sm">Excluir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+{% endblock content %}
+
