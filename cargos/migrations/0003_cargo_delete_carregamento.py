@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("Cargos", "0002_alter_carregamento_data_carregamento"),
+        ("cargos", "0002_alter_carregamento_data_carregamento"),
     ]
 
     operations = [
