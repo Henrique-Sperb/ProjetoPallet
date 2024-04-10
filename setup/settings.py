@@ -1,6 +1,6 @@
 from pathlib import Path
 from decouple import config, Csv
-
+import companys.apps
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +29,7 @@ DJANGO_APPS = [
 
 MY_APPS = [
     "cargos.apps.CargosConfig",
+    "companys.apps.CompanysConfig",
 ]
 
 THIRD_PARTY_APPS = [
@@ -53,7 +54,7 @@ ROOT_URLCONF = "setup.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

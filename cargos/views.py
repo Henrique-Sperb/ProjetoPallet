@@ -3,6 +3,8 @@ from django.urls import reverse_lazy
 from .models import Cargo
 from django.shortcuts import get_object_or_404, redirect
 from datetime import date
+from django.http import HttpResponse
+from django.template import loader
 
 
 class CargoListView(ListView):
