@@ -1,56 +1,39 @@
 {% extends "main.html" %}
 
 {% block page_title %}
-  Lista de Carregamentos
+  Empresas Cadastradas
 {% endblock page_title %}
-
 {% block content %}
-  <br>
-  <h1 align="center"><strong>LISTA DE CARREGAMENTOS</strong></h1>
-  <br>
-  <main class="container-fluid">
-    <table class="table table-striped table-hover" style="border-radius:2%; box-shadow: 0 0 10px #000; bg-color: #F7F2E7; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
+<br><div class="seven">
+    <h1>EMPRESAS CADASTRADAS</h1>
+  </div>
+  <a href="{% url 'company_create' %}" class="btn btn-success" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>NOVA EMPRESA</strong></a>
+  <div>
+    <table id="myTable" class="display table table-striped table-hover" style="align:center; border-radius:2%; box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
       <thead>
-        <tr align="center">
+        <tr>
           <th scope="col">ID</th>
-          <th scope="col">DATA DE ENVIO</th>
-          <th scope="col">DATA DE RECEBIMENTO</th>
-          <th scope="col">EMPRESA DE ORIGEM</th>
-          <th scope="col">EMPRESA DE DESTINO</th>
-          <th scope="col">QUANTIDADE DE PALLETS</th>
-          <th scope="col">VENDA OU DESCARTE</th>
-          <th scope="col">MOTORISTA</th>
-          <th scope="col">Nº DA NOTA FISCAL</th>
+          <th scope="col">NOME</th>
+          <th scope="col">SALDO DE PALLETS</th>
+          <th scope="col">ESTOQUE DE PALLETS</th>
           <th scope="col"></th>
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        {% for cargo in cargo_list %}
-          <tr align="center">
-            <th scope="row">{{ cargo.pk }}</th>
-            <td>{{ cargo.shipment_date }}</td>
-            <td>{{ cargo.unloading_date|default:"-" }}</td>
-            <td>{{ cargo.origin_company }}</td>
-            <td>{{ cargo.destination_company }}</td>
-            <td>{{ cargo.pallets_quantity }}</td>
+        {% for company in company_list %}
+          <tr>
+            <th scope="row">{{ company.pk }}</th>
+            <td>{{ company.name }}</td>
+            <td>{{ company.pallets_balance }}</td>
+            <td>{{ company.pallets_storage }}</td>
             <td>
-              {% if cargo.sale_or_disposal %}
-                Sim
-              {% else %}
-                Não
-              {% endif %}
-            </td>
-            <td>{{ cargo.driver }}</td>
-            <td>{{ cargo.number_nf }}</td>
-            <td>
-              <a href="{% url 'cargo_confirm' pk=cargo.pk %}" class="btn btn-success btn-sm {% if cargo.unloading_date %}disabled{% endif %}" style="border: 2px solid #000">Confirmar</a>
-              <a href="{% url 'cargo_update' pk=cargo.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">Editar</a>
-              <a href="{% url 'cargo_delete' pk=cargo.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">Excluir</a>
+              <a href="{% url 'company_update' pk=company.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">EDITAR</a>
+              <a href="{% url 'company_delete' pk=company.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">EXCLUIR</a>
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
-  </main>
+  </div>
 {% endblock content %}
 

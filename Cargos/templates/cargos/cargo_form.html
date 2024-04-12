@@ -11,18 +11,18 @@
 
 {% block content %}
   <br>
-  <main class="container" style="box-shadow: 0 0 10px #000; width: 30%; margin: auto; border: 1px solid #000; border-radius: 2%; background-color: #74a4fd">
+  {% if cargo.pk %}
+    <h1 align="center"><strong>EDITAR CARREGAMENTO</strong></h1><br>
+  {% else %}
+    <h1 align="center"><strong>NOVO CARREGAMENTO</strong></h1><br>
+  {% endif %}
+  <main class="container" style="box-shadow: 0 0 10px #000; width: 30%; margin: auto; border: 1px solid #000; border-radius: 2%; background-color: #F7F2E7">
     <br>
-    {% if cargo.pk %}
-      <h1 align="center">Editar Carregamento</h1>
-    {% else %}
-      <h1 align="center">Novo Carregamento</h1>
-    {% endif %}
     <form method="POST">
       {% csrf_token %}
-     <strong> {{ form|crispy }} </strong>
-      <button type="submit" style="box-shadow: 0 0 10px #000" class="btn btn-success">Salvar</button>
-      <a href="{% url 'cargo_list' %}" style="box-shadow: 0 0 10px #000" class="btn btn-secondary">Voltar</a>
+      <strong> {{ form|crispy }} </strong>
+      <button type="submit" style="border: 2px solid #000" class="btn btn-success">SALVAR</button>
+      <a href="{% url 'cargo_list' %}" style="border: 2px solid #000" class="btn btn-secondary">VOLTAR</a>
     </form>
     <br>
   </main>

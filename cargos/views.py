@@ -1,10 +1,6 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Cargo
-from django.shortcuts import get_object_or_404, redirect
-from datetime import date
-from django.http import HttpResponse
-from django.template import loader
 
 
 class CargoListView(ListView):
@@ -14,14 +10,16 @@ class CargoListView(ListView):
 class CargoCreateView(CreateView):
     model = Cargo
     fields = [
-        "sale_or_disposal",
+        "vehicle_plate",
         "pallets_quantity",
+        "number_nf",
+        "driver",
         "shipment_date",
         "unloading_date",
         "origin_company",
         "destination_company",
-        "number_nf",
-        "driver",
+        "sale_or_disposal",
+        "voucher",
     ]
     success_url = reverse_lazy("cargo_list")
 
@@ -29,14 +27,16 @@ class CargoCreateView(CreateView):
 class CargoUpdateView(UpdateView):
     model = Cargo
     fields = [
-        "sale_or_disposal",
+        "vehicle_plate",
         "pallets_quantity",
+        "number_nf",
+        "driver",
         "shipment_date",
         "unloading_date",
         "origin_company",
         "destination_company",
-        "number_nf",
-        "driver",
+        "sale_or_disposal",
+        "voucher",
     ]
     success_url = reverse_lazy("cargo_list")
 
@@ -44,11 +44,3 @@ class CargoUpdateView(UpdateView):
 class CargoDeleteView(DeleteView):
     model = Cargo
     success_url = reverse_lazy("cargo_list")
-
-
-class CargoConfirmView(View):
-    def get(self, request, pk):
-        cargo = get_object_or_404(Cargo, pk=pk)
-        cargo.unloading_date = date.today()
-        cargo.save()
-        return redirect("cargo_list")

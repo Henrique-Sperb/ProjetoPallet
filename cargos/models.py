@@ -1,24 +1,47 @@
 from django.db import models
+from companys.models import Company, Driver
 
 
 class Cargo(models.Model):
-    shipment_date = models.DateField(blank=False, verbose_name="Data de Envio")
-    unloading_date = models.DateField(
-        null=True, verbose_name="Data de Recebimento", blank=True
+    vehicle_plate = models.CharField(
+        null=False,
+        blank=False,
+        default="AAA1A11",
+        max_length=7,
+        verbose_name="PLACA DO VEICULO",
     )
     pallets_quantity = models.IntegerField(
-        blank=False, verbose_name="Quantidade de Pallets"
+        blank=False, verbose_name="QUANTIDADE DE PALLETS"
     )
-    origin_company = models.CharField(
-        blank=False, max_length=50, verbose_name="Empresa de Origem"
+    number_nf = models.IntegerField(
+        blank=True, null=True, verbose_name="Nº DA NOTA FISCAL"
     )
-    destination_company = models.CharField(
-        blank=False, max_length=50, verbose_name="Empresa de Destino"
+    driver = models.ForeignKey(
+        Driver,
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+        verbose_name="NOME DO MOTORISTA",
     )
-    number_nf = models.IntegerField(blank=False, verbose_name="Número da Nota Fiscal")
-    driver = models.CharField(
-        blank=False, max_length=50, verbose_name="Nome do Motorista"
+    shipment_date = models.DateField(blank=False, verbose_name="DATA DE ENVIO")
+    unloading_date = models.DateField(
+        null=True, verbose_name="DATA DE RECEBIMENTO", blank=True
+    )
+    origin_company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="origin_cargos",
+        verbose_name="EMPRESA DE ORIGEM",
+    )
+    destination_company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="destination_cargos",
+        verbose_name="EMPRESA DE DESTINO",
     )
     sale_or_disposal = models.BooleanField(
-        default=False, verbose_name="Os pallets foram vendidos ou descartados?"
+        default=False, verbose_name="OS PALLETS FORAM VENDIDOS OU DESCARTADOS?"
+    )
+    voucher = models.BooleanField(
+        default=False, verbose_name="O CLIENTE FINAL GEROU VALE PALLET?"
     )
