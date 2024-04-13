@@ -45,3 +45,40 @@ class Cargo(models.Model):
     voucher = models.BooleanField(
         default=False, verbose_name="O CLIENTE FINAL GEROU VALE PALLET?"
     )
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and self.voucher:
+            Voucher.objects.create(
+                cargo=self.pk,
+                issuer=self.origin_company,
+                recipient=self.destination_company,
+                pallets=self.pallets_quantity,
+                issue_date=self.unloading_date,
+            )
+
+
+class Voucher(models.Model):
+    cargo = models.ForeignKey(
+        Cargo, on_delete=models.CASCADE, related_name='vouchers', verbose_name="CARREGAMENTO",
+    )
+    issuer = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="issued_vouchers",
+        verbose_name="EMISSORA DO VALE",
+    )
+    recipient = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="received_vouchers",
+        verbose_name="RECEBEDORA DO VALE",
+    )
+    pallets = models.IntegerField(null=False, blank=False, verbose_name="QUANTIDADE")
+    issue_date = models.DateField(
+        null=False, blank=False, verbose_name="DATA DE EMISSÃO"
+    )
+    receipt_date = models.DateField(
+        null=True, blank=True, verbose_name="DATA DE RECEBIMENTO"
+    )

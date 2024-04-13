@@ -1,0 +1,48 @@
+{% extends "main.html" %}
+
+{% block page_title %}
+  Lista de Vales
+{% endblock page_title %}
+{% block content %}
+  <br>
+  <div class="seven">
+    <h1>LISTA DE VALES</h1>
+  </div>
+  <a href="{% url 'voucher_create' %}" class="btn btn-success" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>NOVO VALE</strong></a>
+  <table id="myTable" class="display table table-striped table-hover" style="border-radius:2%; box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
+    <thead>
+      <tr align="center">
+        <th scope="col">CARREGAMENTO</th>
+        <th scope="col">EMPRESA EMISSORA</th>
+        <th scope="col">EMPRESA RECEBEDORA</th>
+        <th scope="col">QUANTIDADE</th>
+        <th scope="col">DATA DE EMISSÃO</th>
+        <th scope="col">DATA DE RECEBIMENTO</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for voucher in voucher_list %}
+        <tr>
+          <th scope="row">{{ voucher.cargo }}</th>
+          <td>{{ voucher.issuer }}</td>
+          <td>{{ voucher.recipient }}</td>
+          <td>{{ voucher.pallets }}</td>
+          <td>{{ voucher.issue_date }}</td>
+          <td>
+            {% if voucher.receipt_dat %}
+              voucher.receipt_dat
+            {% else %}
+              Não Recebido
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'voucher_update' pk=voucher.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">EDITAR</a>
+            <a href="{% url 'voucher_delete' pk=voucher.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">EXCLUIR</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock content %}
+

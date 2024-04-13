@@ -1,0 +1,29 @@
+{% extends "main.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+  {% if voucher.pk %}
+    Editar Vale
+  {% else %}
+    Novo Vale
+  {% endif %}
+{% endblock page_title %}
+
+{% block content %}
+  <br>
+  {% if voucher.pk %}
+    <h1 align="center"><strong>EDITAR VALE</strong></h1><br>
+  {% else %}
+    <h1 align="center"><strong>NOVO VALE</strong></h1><br>
+  {% endif %}
+  <main class="container" style="box-shadow: 0 0 10px #000; width: 30%; margin: auto; border: 1px solid #000; border-radius: 2%; background-color: #F7F2E7">
+    <br>
+    <form method="POST">
+      {% csrf_token %}
+      <strong> {{ form|crispy }} </strong>
+      <button type="submit" style="border: 2px solid #000" class="btn btn-success">SALVAR</button>
+      <a href="{% url 'voucher_list' %}" style="border: 2px solid #000" class="btn btn-secondary">VOLTAR</a>
+    </form>
+    <br>
+  </main>
+{% endblock content %}

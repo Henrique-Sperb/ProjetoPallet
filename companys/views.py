@@ -47,10 +47,7 @@ class DriverCreateView(CreateView):
 
 class DriverUpdateView(UpdateView):
     model = Driver
-    fields = [
-        "driver_name",
-        "address"
-    ]
+    fields = ["driver_name", "address"]
     success_url = reverse_lazy("driver_list")
 
 
