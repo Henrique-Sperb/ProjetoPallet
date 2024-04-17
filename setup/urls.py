@@ -16,10 +16,6 @@ from companys.views import (
     CompanyCreateView,
     CompanyUpdateView,
     CompanyDeleteView,
-    DriverListView,
-    DriverCreateView,
-    DriverUpdateView,
-    DriverDeleteView,
 )
 
 urlpatterns = [
@@ -43,16 +39,6 @@ urlpatterns = [
     ),
     path(
         "excluir_empresa/<int:pk>", CompanyDeleteView.as_view(), name="company_delete"
-    ),
-    path("lista_de_motoristas", DriverListView.as_view(), name="driver_list"),
-    path("novo_motorista", DriverCreateView.as_view(), name="driver_create"),
-    path(
-        "atualizar_motorista/<int:pk>",
-        DriverUpdateView.as_view(),
-        name="driver_update",
-    ),
-    path(
-        "excluir_motorista/<int:pk>", DriverDeleteView.as_view(), name="driver_delete"
     ),
     path("lista_de_vales", VoucherListView.as_view(), name="voucher_list"),
     path("novo_vale", VoucherCreateView.as_view(), name="voucher_create"),

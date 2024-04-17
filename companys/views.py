@@ -1,6 +1,6 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Company, Driver
+from .models import Company
 
 
 class CompanyListView(ListView):
@@ -30,27 +30,3 @@ class CompanyUpdateView(UpdateView):
 class CompanyDeleteView(DeleteView):
     model = Company
     success_url = reverse_lazy("company_list")
-
-
-class DriverListView(ListView):
-    model = Driver
-
-
-class DriverCreateView(CreateView):
-    model = Driver
-    fields = [
-        "driver_name",
-        "address",
-    ]
-    success_url = reverse_lazy("driver_list")
-
-
-class DriverUpdateView(UpdateView):
-    model = Driver
-    fields = ["driver_name", "address"]
-    success_url = reverse_lazy("driver_list")
-
-
-class DriverDeleteView(DeleteView):
-    model = Driver
-    success_url = reverse_lazy("driver_list")

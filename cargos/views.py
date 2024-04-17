@@ -1,6 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Cargo, Voucher
+from .forms import CargoForm, VoucherForm
 
 
 class CargoListView(ListView):
@@ -9,35 +10,15 @@ class CargoListView(ListView):
 
 class CargoCreateView(CreateView):
     model = Cargo
-    fields = [
-        "vehicle_plate",
-        "pallets_quantity",
-        "number_nf",
-        "driver",
-        "shipment_date",
-        "unloading_date",
-        "origin_company",
-        "destination_company",
-        "sale_or_disposal",
-        "voucher",
-    ]
+    form_class = CargoForm
+    template_name = 'cargos/cargo_form.html'
     success_url = reverse_lazy("cargo_list")
 
 
 class CargoUpdateView(UpdateView):
     model = Cargo
-    fields = [
-        "vehicle_plate",
-        "pallets_quantity",
-        "number_nf",
-        "driver",
-        "shipment_date",
-        "unloading_date",
-        "origin_company",
-        "destination_company",
-        "sale_or_disposal",
-        "voucher",
-    ]
+    form_class = CargoForm
+    template_name = 'cargos/cargo_form.html'
     success_url = reverse_lazy("cargo_list")
 
 
@@ -52,23 +33,15 @@ class VoucherListView(ListView):
 
 class VoucherCreateView(CreateView):
     model = Voucher
-    fields = [
-        "issuer",
-        "recipient",
-        "pallets",
-        "issue_date",
-    ]
+    form_class = VoucherForm
+    template_name = 'cargos/voucher_form.html'
     success_url = reverse_lazy("voucher_list")
 
 
 class VoucherUpdateView(UpdateView):
     model = Voucher
-    fields = [
-        "issuer",
-        "recipient",
-        "pallets",
-        "issue_date",
-    ]
+    form_class = VoucherForm
+    template_name = 'cargos/voucher_form.html'
     success_url = reverse_lazy("voucher_list")
 
 

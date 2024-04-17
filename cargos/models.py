@@ -1,31 +1,26 @@
 from django.db import models
-from companys.models import Company, Driver
+from companys.models import Company
+from django import forms
 
 
 class Cargo(models.Model):
     vehicle_plate = models.CharField(
-        null=False,
-        blank=False,
-        default="AAA1A11",
         max_length=7,
         verbose_name="PLACA DO VEICULO",
     )
     pallets_quantity = models.IntegerField(
-        blank=False, verbose_name="QUANTIDADE DE PALLETS"
+        verbose_name="QUANTIDADE DE PALLETS"
     )
     number_nf = models.IntegerField(
         blank=True, null=True, verbose_name="Nº DA NOTA FISCAL"
     )
-    driver = models.ForeignKey(
-        Driver,
-        null=True,
-        blank=False,
-        on_delete=models.SET_NULL,
+    driver = models.CharField(
+        max_length=20,
         verbose_name="NOME DO MOTORISTA",
     )
     shipment_date = models.DateField(blank=False, verbose_name="DATA DE ENVIO")
     unloading_date = models.DateField(
-        null=True, verbose_name="DATA DE RECEBIMENTO", blank=True
+        null=True, blank=True, verbose_name="DATA DE RECEBIMENTO"
     )
     origin_company = models.ForeignKey(
         Company,
@@ -40,15 +35,35 @@ class Cargo(models.Model):
         verbose_name="EMPRESA DE DESTINO",
     )
     sale_or_disposal = models.BooleanField(
-        default=False, verbose_name="OS PALLETS FORAM VENDIDOS OU DESCARTADOS?"
+        verbose_name="OS PALLETS FORAM VENDIDOS OU DESCARTADOS?"
     )
     voucher = models.BooleanField(
-        default=False, verbose_name="O CLIENTE FINAL GEROU VALE PALLET?"
+        verbose_name="O CLIENTE FINAL GEROU VALE PALLET?"
     )
 
     def save(self, *args, **kwargs):
+        # verifica se o objeto já existe no banco de dados
         is_new = self.pk is None
+        if not is_new:
+            orig = Cargo.objects.get(pk=self.pk)
+            # atualiza o estoque e o saldo de pallets da empresa de origem e destino
+            orig.origin_company.pallets_storage += orig.pallets_quantity
+            orig.origin_company.pallets_balance -= orig.pallets_quantity
+            orig.origin_company.save()
+            orig.destination_company.pallets_storage -= orig.pallets_quantity
+            orig.destination_company.pallets_balance += orig.pallets_quantity
+            orig.destination_company.save()
+
         super().save(*args, **kwargs)
+
+        # atualiza o estoque e o saldo de pallets da empresa de origem e destino
+        self.origin_company.pallets_storage -= self.pallets_quantity
+        self.origin_company.pallets_balance += self.pallets_quantity
+        self.origin_company.save()
+        self.destination_company.pallets_storage += self.pallets_quantity
+        self.destination_company.pallets_balance -= self.pallets_quantity
+        self.destination_company.save()
+
         if is_new and self.voucher:
             Voucher.objects.create(
                 cargo=self.pk,
@@ -77,7 +92,7 @@ class Voucher(models.Model):
     )
     pallets = models.IntegerField(null=False, blank=False, verbose_name="QUANTIDADE")
     issue_date = models.DateField(
-        null=False, blank=False, verbose_name="DATA DE EMISSÃO"
+        verbose_name="DATA DE EMISSÃO"
     )
     receipt_date = models.DateField(
         null=True, blank=True, verbose_name="DATA DE RECEBIMENTO"
