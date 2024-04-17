@@ -1,6 +1,5 @@
 from django.db import models
 from companys.models import Company
-from django import forms
 
 
 class Cargo(models.Model):
