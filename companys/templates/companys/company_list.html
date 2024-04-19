@@ -34,6 +34,7 @@
               {% endif %}
             </td>
             <td>
+              <a href="{% url 'company_debts' pk=company.pk %}" class="btn btn-primary btn-sm" style="border: 2px solid #000">DETALHAR</a>
               <a href="{% url 'company_update' pk=company.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">EDITAR</a>
               <a href="{% url 'company_delete' pk=company.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">EXCLUIR</a>
             </td>

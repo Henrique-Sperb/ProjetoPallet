@@ -17,3 +17,6 @@ class Company(models.Model):
 
     def get_received_vouchers(self):
         return self.received_vouchers.all()
+
+    def get_debts(self):
+        return self.debts_owed.all()

@@ -1,6 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from companys.models import Company
 from .models import Cargo, Voucher, Debt
 from .forms import CargoForm, VoucherForm
 
@@ -51,5 +52,10 @@ class VoucherDeleteView(DeleteView):
     success_url = reverse_lazy("voucher_list")
 
 
-class DebtListView(ListView):
+class CompanyDebtListView(ListView):
     model = Debt
+    template_name = 'debt_list.html'
+
+    def get_queryset(self):
+        company = get_object_or_404(Company, pk=self.kwargs.get('pk'))
+        return company.get_debts()

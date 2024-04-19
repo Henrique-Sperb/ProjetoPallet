@@ -6,28 +6,30 @@
 {% block content %}
   <br>
   <div class="seven">
-    <h1>LISTA DE DÍVIDAS</h1>
+    <h1>DÍVIDAS DA FILIAL</h1>
   </div>
-  <table class="display table table-striped table-hover" style="border-radius:2%; box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
-    <thead>
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">EMPRESA DEVEDORA</th>
-        <th scope="col">EMPRESA CREDORA</th>
-        <th scope="col">QUANTIDADE</th>
-      </tr>
-    </thead>
-    <tbody class="table-group-divider">
-      {% for debt in debt_list %}
+  <a href="{% url 'company_list' %}" class="btn btn-primary" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>VOLTAR</strong></a>
+  <div>
+    <table id="myTable" class="display table table-striped table-hover" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
+      <thead>
         <tr>
-          <th scope="row">{{ debt.id }}</th>
-          <td>{{ debt.debtor }}</td>
-          <td>{{ debt.creditor }}</td>
-          <td>{{ debt.amount }}</td>
-          <td>{{ voucher.issue_date }}</td>
+          <th scope="col">ID</th>
+          <th scope="col">EMPRESA DEVEDORA</th>
+          <th scope="col">EMPRESA CREDORA</th>
+          <th scope="col">QUANTIDADE</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for debt in debt_list %}
+          <tr>
+            <th scope="row">{{ debt.id }}</th>
+            <td>{{ debt.debtor }}</td>
+            <td>{{ debt.creditor }}</td>
+            <td>{{ debt.amount }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock content %}
 
