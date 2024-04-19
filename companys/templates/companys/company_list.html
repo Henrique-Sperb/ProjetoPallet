@@ -6,7 +6,7 @@
 {% block content %}
   <br>
   <div class="seven">
-    <h1>LISTA DE EMPRESAS</h1>
+    <h1>EMPRESAS</h1>
   </div>
   <a href="{% url 'company_create' %}" class="btn btn-success" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>NOVA EMPRESA</strong></a>
   <div>
@@ -20,7 +20,7 @@
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody class="table-group-divider">
+      <tbody>
         {% for company in company_list %}
           <tr>
             <th scope="row">{{ company.pk }}</th>

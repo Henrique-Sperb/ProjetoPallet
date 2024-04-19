@@ -12,22 +12,26 @@
   <br>
     <table class="table table-striped table-hover" style="border-radius:2%; box-shadow: 0 0 10px #000; bg-color: #F7F2E7; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
       <thead>
-        <tr align="center">
+        <tr>
           <th scope="col">ID</th>
-          <th scope="col">CNPJ</th>
-          <th scope="col">ENDEREÇO</th>
+          <th scope="col">NOME</th>
           <th scope="col">SALDO DE PALLETS</th>
           <th scope="col">ESTOQUE DE PALLETS</th>
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody class="table-group-divider">
-        <tr align="center">
+      <tbody>
+        <tr>
           <th scope="row">{{ company.pk }}</th>
-          <td>{{ company.name }}</td>
-          <td>{{ company.address }}</td>
-          <td>{{ company.pallets_balance }}</td>
-          <td>{{ company.pallets_storage }}</td>
+            <td>{{ company.name }}</td>
+            <td>{{ company.pallets_balance }}</td>
+            <td>
+              {% if company.is_reiter_branch %}
+                {{ company.pallets_storage }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
           <td>
             <form method="POST">
               {% csrf_token %}

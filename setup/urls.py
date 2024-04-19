@@ -10,6 +10,7 @@ from cargos.views import (
     VoucherUpdateView,
     VoucherDeleteView,
     CompanyDebtListView,
+    ShipperDebtListView,
 )
 
 from companys.views import (
@@ -21,8 +22,10 @@ from companys.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('company/<int:pk>/debts/', CompanyDebtListView.as_view(), name='company_debts'),
-    path("lista_de_carregamentos", CargoListView.as_view(), name="cargo_list"),
+    path(
+        "company/<int:pk>/debts/", CompanyDebtListView.as_view(), name="company_debts"
+    ),
+    path("", CargoListView.as_view(), name="cargo_list"),
     path("novo_carregamento", CargoCreateView.as_view(), name="cargo_create"),
     path(
         "atualizar_carregamento/<int:pk>",

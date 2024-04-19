@@ -1,28 +1,30 @@
 {% extends "main.html" %}
 
 {% block page_title %}
-  Controle de Carregamentos
+  Controle de Pallets
 {% endblock page_title %}
 {% block content %}
   <br>
   <div class="seven">
-    <h1>LISTA DE CARREGAMENTOS</h1>
+    <h1>CONTROLE DE PALLETS</h1>
   </div>
   <a href="{% url 'cargo_create' %}" class="btn btn-success" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>NOVO CARREGAMENTO</strong></a>
   <div class="table-responsive">
   <table id="myTable" class="display table table-striped table-hover" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
     <thead>
-      <tr align="center">
+      <tr>
         <th scope="col">PLACA</th>
         <th scope="col">QUANTIDADE</th>
         <th scope="col">Nº NF</th>
         <th scope="col">MOTORISTA</th>
-        <th scope="col">DATA ENVIO</th>
-        <th scope="col">DATA RECEBIMENTO</th>
+        <th scope="col">ENVIO</th>
+        <th scope="col">RECEBIMENTO</th>
         <th scope="col">ORIGEM</th>
         <th scope="col">DESTINO</th>
         <th scope="col">VENDA/DESCARTE</th>
         <th scope="col">VALE PALLET</th>
+        <th scope="col">EMBARCADOR</th>
+        <th scope="col">FILIAL</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -51,6 +53,8 @@
               Não
             {% endif %}
           </td>
+          <td>{{ cargo.associated_shipper }}</td>
+          <td>{{ cargo.responsible_branch }}</td>
           <td>
             <a href="{% url 'cargo_update' pk=cargo.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">EDITAR</a>
             <a href="{% url 'cargo_delete' pk=cargo.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">EXCLUIR</a>

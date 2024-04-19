@@ -12,17 +12,19 @@
   <br>
   <table id="myTable" class="display table table-striped table-hover" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
     <thead>
-      <tr align="center">
+      <tr>
         <th scope="col">PLACA</th>
         <th scope="col">QUANTIDADE</th>
         <th scope="col">Nº NF</th>
         <th scope="col">MOTORISTA</th>
-        <th scope="col">DATA ENVIO</th>
-        <th scope="col">DATA RECEBIMENTO</th>
+        <th scope="col">ENVIO</th>
+        <th scope="col">RECEBIMENTO</th>
         <th scope="col">ORIGEM</th>
         <th scope="col">DESTINO</th>
         <th scope="col">VENDA/DESCARTE</th>
         <th scope="col">VALE PALLET</th>
+        <th scope="col">EMBARCADOR</th>
+        <th scope="col">FILIAL</th>
         <th scope="col"></th>
       </tr>
     </thead>
@@ -50,6 +52,8 @@
               Não
             {% endif %}
           </td>
+          <td>{{ cargo.associated_shipper }}</td>
+          <td>{{ cargo.responsible_branch }}</td>
           <td>
             <form method="POST">
               {% csrf_token %}
