@@ -16,14 +16,24 @@ class CargoForm(forms.ModelForm):
             'destination_company',
             'sale_or_disposal',
             'voucher',
+            'responsible_branch',
+            'associated_shipper',
         ]
 
-    def clean_vehicle_plate(self):
-        vehicle_plate = self.cleaned_data.get('vehicle_plate')
-        # Adicione sua lógica de validação aqui. Por exemplo:
-        if len(vehicle_plate) != 7:
-            raise forms.ValidationError("A placa do veículo deve ter 7 caracteres.")
-        return vehicle_plate
+    def clean(self):
+        cleaned_data = super().clean()
+        origin_company = cleaned_data.get('origin_company')
+        destination_company = cleaned_data.get('destination_company')
+
+        # Se a empresa de origem não é uma filial da Reiter, define o associated_shipper como a empresa de origem
+        if origin_company and not origin_company.is_reiter_branch:
+            cleaned_data['associated_shipper'] = origin_company
+
+        # Se a empresa de destino é uma filial da Reiter, define o responsible_branch como a empresa de destino
+        if destination_company and destination_company.is_reiter_branch:
+            cleaned_data['responsible_branch'] = destination_company
+
+        return cleaned_data
 
 
 class CompanyForm(forms.ModelForm):

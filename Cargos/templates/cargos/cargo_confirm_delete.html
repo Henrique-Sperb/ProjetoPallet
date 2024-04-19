@@ -10,29 +10,32 @@
   <br>
   <h1 align="center"><strong>EXCLUIR CARREGAMENTO</strong></h1>
   <br>
-    <table class="table table-striped table-hover" style="border-radius:2%; box-shadow: 0 0 10px #000; bg-color: #F7F2E7; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
-      <thead>
-        <tr align="center">
-          <th scope="col">ID</th>
-          <th scope="col">DATA DE ENVIO</th>
-          <th scope="col">DATA DE RECEBIMENTO</th>
-          <th scope="col">EMPRESA DE ORIGEM</th>
-          <th scope="col">EMPRESA DE DESTINO</th>
-          <th scope="col">QUANTIDADE DE PALLETS</th>
-          <th scope="col">VENDA OU DESCARTE</th>
-          <th scope="col">MOTORISTA</th>
-          <th scope="col">Nº DA NOTA FISCAL</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody class="table-group-divider">
-        <tr align="center">
-          <th scope="row">{{ cargo.pk }}</th>
+  <table id="myTable" class="display table table-striped table-hover" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
+    <thead>
+      <tr align="center">
+        <th scope="col">PLACA</th>
+        <th scope="col">QUANTIDADE</th>
+        <th scope="col">Nº NF</th>
+        <th scope="col">MOTORISTA</th>
+        <th scope="col">DATA ENVIO</th>
+        <th scope="col">DATA RECEBIMENTO</th>
+        <th scope="col">ORIGEM</th>
+        <th scope="col">DESTINO</th>
+        <th scope="col">VENDA/DESCARTE</th>
+        <th scope="col">VALE PALLET</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        <tr>
+          <th scope="row">{{ cargo.vehicle_plate }}</th>
+          <td>{{ cargo.pallets_quantity }}</td>
+          <td>{{ cargo.number_nf|default:"-" }}</td>
+          <td>{{ cargo.driver }}</td>
           <td>{{ cargo.shipment_date }}</td>
           <td>{{ cargo.unloading_date|default:"-" }}</td>
           <td>{{ cargo.origin_company }}</td>
           <td>{{ cargo.destination_company }}</td>
-          <td>{{ cargo.pallets_quantity }}</td>
           <td>
             {% if cargo.sale_or_disposal %}
               Sim
@@ -40,8 +43,13 @@
               Não
             {% endif %}
           </td>
-          <td>{{ cargo.driver }}</td>
-          <td>{{ cargo.number_nf }}</td>
+          <td>
+            {% if cargo.voucher %}
+              Sim
+            {% else %}
+              Não
+            {% endif %}
+          </td>
           <td>
             <form method="POST">
               {% csrf_token %}
@@ -51,7 +59,7 @@
             </form>
           </td>
         </tr>
-      </tbody>
-    </table>
+    </tbody>
+  </table>
 
 {% endblock content %}

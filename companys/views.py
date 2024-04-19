@@ -13,6 +13,7 @@ class CompanyCreateView(CreateView):
         "name",
         "pallets_balance",
         "pallets_storage",
+        "is_reiter_branch",
     ]
     success_url = reverse_lazy("company_list")
 

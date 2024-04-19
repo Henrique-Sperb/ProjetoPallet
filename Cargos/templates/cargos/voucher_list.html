@@ -12,7 +12,7 @@
   <table id="myTable" class="display table table-striped table-hover" style="border-radius:2%; box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; border-radius: 15px; overflow: hidden; border: 3px #000; font-family: Trebuchet MS">
     <thead>
       <tr align="center">
-        <th scope="col">CARREGAMENTO</th>
+        <th scope="col">ID DO CARREGAMENTO</th>
         <th scope="col">EMPRESA EMISSORA</th>
         <th scope="col">EMPRESA RECEBEDORA</th>
         <th scope="col">QUANTIDADE</th>
@@ -24,7 +24,7 @@
     <tbody class="table-group-divider">
       {% for voucher in voucher_list %}
         <tr>
-          <th scope="row">{{ voucher.cargo }}</th>
+          <th scope="row">{{ voucher.cargo.id }}</th>
           <td>{{ voucher.issuer }}</td>
           <td>{{ voucher.recipient }}</td>
           <td>{{ voucher.pallets }}</td>

@@ -7,6 +7,7 @@ class Company(models.Model):
     )
     pallets_balance = models.IntegerField(verbose_name="SALDO DE PALLETS")
     pallets_storage = models.IntegerField(verbose_name="ESTOQUE DE PALLETS")
+    is_reiter_branch = models.BooleanField(verbose_name="É FILIAL DA REITER?")
 
     def __str__(self):
         return self.name

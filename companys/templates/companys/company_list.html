@@ -4,7 +4,8 @@
   Empresas Cadastradas
 {% endblock page_title %}
 {% block content %}
-<br><div class="seven">
+  <br>
+  <div class="seven">
     <h1>LISTA DE EMPRESAS</h1>
   </div>
   <a href="{% url 'company_create' %}" class="btn btn-success" style="border: 2px solid #000; margin-bottom: 12px; font-family: Trebuchet MS"><strong>NOVA EMPRESA</strong></a>
@@ -25,7 +26,13 @@
             <th scope="row">{{ company.pk }}</th>
             <td>{{ company.name }}</td>
             <td>{{ company.pallets_balance }}</td>
-            <td>{{ company.pallets_storage }}</td>
+            <td>
+              {% if company.is_reiter_branch %}
+                {{ company.pallets_storage }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
             <td>
               <a href="{% url 'company_update' pk=company.pk %}" class="btn btn-secondary btn-sm" style="border: 2px solid #000">EDITAR</a>
               <a href="{% url 'company_delete' pk=company.pk %}" class="btn btn-danger btn-sm" style="border: 2px solid #000">EXCLUIR</a>

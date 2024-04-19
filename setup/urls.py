@@ -9,6 +9,7 @@ from cargos.views import (
     VoucherCreateView,
     VoucherUpdateView,
     VoucherDeleteView,
+    DebtListView,
 )
 
 from companys.views import (
@@ -51,5 +52,10 @@ urlpatterns = [
         "excluir_vale/<int:pk>",
         VoucherDeleteView.as_view(),
         name="voucher_delete",
+    ),
+    path(
+        "lista_de_dividas",
+        DebtListView.as_view(),
+        name="debt_list",
     ),
 ]

@@ -1,6 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Cargo, Voucher
+from django.shortcuts import render
+from .models import Cargo, Voucher, Debt
 from .forms import CargoForm, VoucherForm
 
 
@@ -48,3 +49,7 @@ class VoucherUpdateView(UpdateView):
 class VoucherDeleteView(DeleteView):
     model = Voucher
     success_url = reverse_lazy("voucher_list")
+
+
+class DebtListView(ListView):
+    model = Debt
