@@ -1,7 +1,6 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render
-from django.db import models
 from django.db.models import Sum
 from companys.models import Company
 from .models import Cargo, Voucher, Debt
