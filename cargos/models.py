@@ -49,8 +49,9 @@ class Cargo(models.Model):
         verbose_name="EMBARCADOR ASSOCIADO",
     )
 
-    def update_company_pallets(self, company, pallets_quantity):
-        company.pallets_storage = F("pallets_storage") + pallets_quantity
+    def update_company_pallets(self, company, pallets_quantity, att_storage=True):
+        if att_storage:
+            company.pallets_storage = F("pallets_storage") + pallets_quantity
         company.pallets_balance = F("pallets_balance") - pallets_quantity
 
     @transaction.atomic
@@ -60,22 +61,37 @@ class Cargo(models.Model):
             orig = Cargo.objects.select_related(
                 "origin_company", "destination_company"
             ).get(pk=self.pk)
-            self.update_company_pallets(orig.origin_company, orig.pallets_quantity)
-            self.update_company_pallets(
-                orig.destination_company, -orig.pallets_quantity
-            )
+            if self.voucher:
+                self.update_company_pallets(orig.origin_company, -orig.pallets_quantity)
+                self.update_company_pallets(
+                    orig.responsible_branch, orig.pallets_quantity, False
+                )
+            else:
+                self.update_company_pallets(orig.origin_company, -orig.pallets_quantity)
+                self.update_company_pallets(
+                    orig.responsible_branch, orig.pallets_quantity, True
+                )
+
             orig.origin_company.save()
             orig.destination_company.save()
-
         super().save(*args, **kwargs)
 
-        self.update_company_pallets(self.origin_company, -self.pallets_quantity)
-        self.update_company_pallets(self.destination_company, self.pallets_quantity)
+        if self.voucher:
+            self.update_company_pallets(self.origin_company, -self.pallets_quantity)
+            self.update_company_pallets(
+                self.responsible_branch, self.pallets_quantity, False
+            )
+        else:
+            self.update_company_pallets(self.origin_company, -self.pallets_quantity)
+            self.update_company_pallets(
+                self.responsible_branch, self.pallets_quantity, True
+            )
+
         self.origin_company.save()
-        self.destination_company.save()
+        self.responsible_branch.save()
 
         debt, created = Debt.objects.get_or_create(
-            debtor=self.destination_company,
+            debtor=self.responsible_branch,
             creditor=self.associated_shipper,
             defaults={"amount": self.pallets_quantity},
         )
@@ -102,10 +118,10 @@ class Cargo(models.Model):
             debt_sending_branch.amount -= self.pallets_quantity
             debt_sending_branch.save()
 
-        if is_new and self.voucher:
+        if self.voucher:
             Voucher.objects.create(
                 cargo=self,
-                issuer=self.origin_company,
+                issuer=self.associated_shipper,
                 recipient=self.responsible_branch,
                 pallets=self.pallets_quantity,
                 issue_date=self.unloading_date,

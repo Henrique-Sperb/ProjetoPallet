@@ -62,15 +62,19 @@ class CompanyDebtListView(ListView):
     def get_queryset(self):
         company = get_object_or_404(Company, pk=self.kwargs.get("pk"))
         if company.is_reiter_branch:
-            return company.debts_owed.annotate(total_debt=Sum("amount")).order_by("-total_debt")
+            return company.debts_owed.annotate(total_debt=Sum("amount")).order_by(
+                "-total_debt"
+            )
         else:
-            return company.debts_due.annotate(total_debt=Sum("amount")).order_by("-total_debt")
+            return company.debts_due.annotate(total_debt=Sum("amount")).order_by(
+                "-total_debt"
+            )
 
     def get_context_data(self, **kwargs):
-        if not hasattr(self, 'company'):
+        if not hasattr(self, "company"):
             self.company = get_object_or_404(Company, pk=self.kwargs.get("pk"))
         context = super().get_context_data(**kwargs)
-        context['company'] = self.company
+        context["company"] = self.company
         return context
 
 
@@ -79,5 +83,5 @@ class ShipperDebtListView(ListView):
     template_name = "home.html"
 
     def creditors(request):
-        creditors = Company.objects.annotate(total_debt=Sum('debts__amount'))
-        return render(request, 'home.html', {'creditors': creditors})
+        creditors = Company.objects.annotate(total_debt=Sum("debts__amount"))
+        return render(request, "home.html", {"creditors": creditors})
