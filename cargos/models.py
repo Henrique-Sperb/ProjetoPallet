@@ -1,5 +1,4 @@
 from django.db import models, transaction
-from django.db.models import F
 from companys.models import Company
 
 
@@ -49,11 +48,6 @@ class Cargo(models.Model):
         verbose_name="EMBARCADOR ASSOCIADO",
     )
 
-    def update_company_pallets(self, company, pallets_quantity, att_storage=True):
-        if att_storage:
-            company.pallets_storage = F("pallets_storage") + pallets_quantity
-        company.pallets_balance = F("pallets_balance") - pallets_quantity
-
     @transaction.atomic
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -61,49 +55,60 @@ class Cargo(models.Model):
             orig = Cargo.objects.select_related(
                 "origin_company", "destination_company"
             ).get(pk=self.pk)
-            if self.voucher:
-                self.update_company_pallets(orig.origin_company, -orig.pallets_quantity)
-                self.update_company_pallets(
-                    orig.responsible_branch, orig.pallets_quantity, False
-                )
+            if self.is_transfer() or self.is_devolution() or self.is_shipper_branch_cargo():
+                # Se ambas as empresas de origem e destino forem filiais
+                orig.update_company_pallets(self.origin_company, self.pallets_quantity)
+                orig.update_company_pallets(self.destination_company, -self.pallets_quantity)
+            elif self.is_long_haul():
+                if self.voucher:
+                    orig.update_company_pallets(self.origin_company, self.pallets_quantity)
+                    orig.update_company_pallets(self.responsible_branch, -self.pallets_quantity, False)
+                else:
+                    orig.update_company_pallets(self.origin_company, self.pallets_quantity)
+                    orig.update_company_pallets(self.responsible_branch, -self.pallets_quantity)
             else:
-                self.update_company_pallets(orig.origin_company, -orig.pallets_quantity)
-                self.update_company_pallets(
-                    orig.responsible_branch, orig.pallets_quantity, True
-                )
+                # Entrega de uma filial para um cliente final
+                if self.voucher:
+                    self.responsible_branch.pallets_storage -= self.pallets_quantity
+                    self.responsible_branch.save()
 
-            orig.origin_company.save()
-            orig.destination_company.save()
         super().save(*args, **kwargs)
 
-        if self.voucher:
-            self.update_company_pallets(self.origin_company, -self.pallets_quantity)
-            self.update_company_pallets(
-                self.responsible_branch, self.pallets_quantity, False
-            )
+        if self.is_transfer() or self.is_devolution() or self.is_shipper_branch_cargo():
+            # Se ambas as empresas de origem e destino forem filiais
+            self.update_company_pallets(self.origin_company, self.pallets_quantity)
+            self.update_company_pallets(self.destination_company, -self.pallets_quantity)
+        elif self.is_long_haul():
+            if self.voucher:
+                self.update_company_pallets(self.origin_company, self.pallets_quantity)
+                self.update_company_pallets(self.responsible_branch, -self.pallets_quantity, False)
+            else:
+                self.update_company_pallets(self.origin_company, self.pallets_quantity)
+                self.update_company_pallets(self.responsible_branch, -self.pallets_quantity)
         else:
-            self.update_company_pallets(self.origin_company, -self.pallets_quantity)
-            self.update_company_pallets(
-                self.responsible_branch, self.pallets_quantity, True
+            # Entrega de uma filial para um cliente final
+            if self.voucher:
+                self.responsible_branch.pallets_storage -= self.pallets_quantity
+                self.responsible_branch.save()
+
+        if not self.is_long_haul():
+            debt, created = Debt.objects.get_or_create(
+                debtor=self.responsible_branch,
+                creditor=self.associated_shipper,
+                defaults={"amount": self.pallets_quantity},
             )
 
-        self.origin_company.save()
-        self.responsible_branch.save()
-
-        debt, created = Debt.objects.get_or_create(
-            debtor=self.responsible_branch,
-            creditor=self.associated_shipper,
-            defaults={"amount": self.pallets_quantity},
-        )
-
-        if not created:
-            # se a dívida já existir, atualiza a quantidade
-            debt.amount += self.pallets_quantity
-            debt.save()
+            if not created:
+                # se a dívida já existir, atualiza a quantidade
+                if self.destination_company == self.associated_shipper:
+                    debt.amount -= self.pallets_quantity
+                else:
+                    debt.amount += self.pallets_quantity
+                debt.save()
 
         if (
-            self.origin_company.is_reiter_branch
-            and self.destination_company.is_reiter_branch
+                self.origin_company.is_reiter_branch
+                and self.destination_company.is_reiter_branch
         ):
             # atualiza a dívida da filial que está enviando os pallets
             debt_sending_branch, created = Debt.objects.get_or_create(
@@ -121,11 +126,43 @@ class Cargo(models.Model):
         if self.voucher:
             Voucher.objects.create(
                 cargo=self,
-                issuer=self.associated_shipper,
+                issuer=self.destination_company,
                 recipient=self.responsible_branch,
                 pallets=self.pallets_quantity,
                 issue_date=self.unloading_date,
             )
+
+    def is_long_haul(self):
+        return (
+                not self.origin_company.is_reiter_branch
+                and not self.destination_company.is_reiter_branch
+                and self.destination_company != self.associated_shipper
+        )
+
+    def is_devolution(self):
+        return (
+                self.origin_company.is_reiter_branch
+                and not self.destination_company.is_reiter_branch
+                and self.destination_company == self.associated_shipper
+        )
+
+    def is_transfer(self):
+        return (
+                self.origin_company.is_reiter_branch
+                and self.destination_company.is_reiter_branch
+        )
+
+    def is_shipper_branch_cargo(self):
+        return (
+                not self.origin_company.is_reiter_branch
+                and self.destination_company.is_reiter_branch
+        )
+
+    def update_company_pallets(self, company, pallets_quantity, att_storage=True):
+        if att_storage:
+            company.pallets_storage -= pallets_quantity
+        company.pallets_balance += pallets_quantity
+        company.save()
 
 
 class Voucher(models.Model):
