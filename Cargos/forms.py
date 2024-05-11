@@ -24,21 +24,25 @@ class CargoForm(forms.ModelForm):
         cleaned_data = super().clean()
         origin_company = cleaned_data.get("origin_company")
         destination_company = cleaned_data.get("destination_company")
-        voucher = cleaned_data.get("voucher")
 
-        # Se a empresa de origem não é uma filial da Reiter, define o associated_shipper como a empresa de origem
+        # Se a empresa de origem não é uma filial da Reiter, define o associated_shipper como a empresa de origem.
         if not origin_company.is_reiter_branch:
             cleaned_data["associated_shipper"] = origin_company
 
-        # Se a empresa de destino é uma filial da Reiter, define o responsible_branch como a empresa de destino
+        # Se a empresa de destino é uma filial da Reiter, define o responsible_branch como a empresa de destino.
         if destination_company.is_reiter_branch:
             cleaned_data["responsible_branch"] = destination_company
 
+        # Se a empresa de origem é uma filial da Reiter e a empresa de destino não, define o responsible_branch como a
+        # empresa de destino.
         if origin_company.is_reiter_branch and not destination_company.is_reiter_branch:
             cleaned_data["responsible_branch"] = origin_company
 
+        # Se for uma transferência, devolução ou um carregamento vindo de um embarcador para uma filial, define os
+        # campos voucher e sale_or_disposal como False, independente do que foi marcado no formulário.
         if self.is_transfer() or self.is_devolution() or self.is_shipper_branch_cargo():
             cleaned_data["voucher"] = False
+            cleaned_data["sale_or_disposal"] = False
 
         return cleaned_data
 
@@ -47,25 +51,20 @@ class CargoForm(forms.ModelForm):
         destination_company = self.cleaned_data.get("destination_company")
         associated_shipper = self.cleaned_data.get("associated_shipper")
         return (
-                origin_company.is_reiter_branch
-                and not destination_company.is_reiter_branch
-                and destination_company == associated_shipper
+            origin_company.is_reiter_branch
+            and destination_company == associated_shipper
         )
 
     def is_transfer(self):
         origin_company = self.cleaned_data.get("origin_company")
         destination_company = self.cleaned_data.get("destination_company")
-        return (
-                origin_company.is_reiter_branch
-                and destination_company.is_reiter_branch
-        )
+        return origin_company.is_reiter_branch and destination_company.is_reiter_branch
 
     def is_shipper_branch_cargo(self):
         origin_company = self.cleaned_data.get("origin_company")
         destination_company = self.cleaned_data.get("destination_company")
         return (
-                not origin_company.is_reiter_branch
-                and destination_company.is_reiter_branch
+            not origin_company.is_reiter_branch and destination_company.is_reiter_branch
         )
 
 
