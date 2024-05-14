@@ -59,7 +59,7 @@ class Cargo(models.Model):
 
         # Se is_new for True.
         if is_new:
-            # Verifica através dos métodos se o carregamento é uma transferência, devolução ou um carregamento vindo
+            # Verifica se o carregamento é uma transferência, devolução ou um carregamento vindo
             # direto de um embarcador e atualiza o estoque e o saldo das empresas de origem e destino.
             if (
                 self.is_transfer()
@@ -97,6 +97,24 @@ class Cargo(models.Model):
                 # Se não foi gerado um vale e não houve venda/descarte,
                 # considera-se que os pallets retornaram para a filial, logo nenhum campo deve ser alterado.
 
+            debt, created = Debt.objects.get_or_create(
+                debtor=self.responsible_branch,
+                creditor=self.associated_shipper,
+                defaults={"amount": self.pallets_quantity},
+            )
+
+            # Se created for False, significa que a dívida já existia e atualiza a quantidade.
+            debt.update_debt(self.pallets_quantity, is_devolution=self.is_devolution())
+
+            # Se for uma transferência, atualiza a dívida da filial de origem
+            if self.is_transfer():
+                debt_sending_branch, created = Debt.objects.get_or_create(
+                    debtor=self.origin_company,
+                    creditor=self.associated_shipper,
+                    defaults={"amount": 0},
+                )
+                debt_sending_branch.update_debt(self.pallets_quantity)
+
         # Se is_new for False.
         if not is_new:
             # Realiza uma busca no banco de dados e atribui a variável orig
@@ -105,9 +123,13 @@ class Cargo(models.Model):
                 "origin_company", "destination_company"
             ).get(pk=self.pk)
 
-            # Atribui a variável pallets_difference o módulo da diferença entre o valor atual e o novo valor.
-            pallets_difference = abs(orig.pallets_quantity - self.pallets_quantity)
-
+            # Calcula a diferença entre a quantidade de pallets do objeto original e a do valor atual.
+            # Se a quantidade original for maior que a atual, a diferença é negativa para representar uma redução.
+            # Caso contrário, a diferença é positiva (em valor absoluto) para representar um aumento.
+            if orig.pallets_quantity > self.pallets_quantity:
+                pallets_difference = -(orig.pallets_quantity - self.pallets_quantity)
+            else:
+                pallets_difference = abs(orig.pallets_quantity - self.pallets_quantity)
             # Verifica através dos métodos se o carregamento é uma transferência, devolução ou um carregamento vindo
             # direto de um embarcador e atualiza o estoque e o saldo das empresas de origem e destino.
             if (
@@ -142,43 +164,29 @@ class Cargo(models.Model):
                 # Se não foi gerado um vale e não houve venda/descarte,
                 # considera-se que os pallets retornaram para a filial, logo nenhum campo deve ser alterado.
 
-        super().save(*args, **kwargs)
+            # A função get_or_create busca no banco de dados um objeto com os parâmetros informados,
+            # se o objeto não existir ele será criado com os valores informados e a variável created receberá True,
+            # mas caso o objeto exista, seus valores serão atribuídos a variável debt, e created receberá False.
+            debt, created = Debt.objects.get_or_create(
+                debtor=self.responsible_branch,
+                creditor=self.associated_shipper,
+                defaults={"amount": self.pallets_quantity},
+            )
 
-        # A função get_or_create busca no banco de dados um objeto com os parâmetros informados,
-        # se o objeto não existir ele será criado com os valores informados e a variável created receberá True,
-        # mas caso o objeto exista, seus valores serão atribuídos a variável debt, e created receberá False.
-        debt, created = Debt.objects.get_or_create(
-            debtor=self.responsible_branch,
-            creditor=self.associated_shipper,
-            defaults={"amount": self.pallets_quantity},
-        )
-        # Se created for False, significa que a dívida já existia e atualiza a quantidade.
-        if not created:
-            # Verifica se é uma devolução a Embarcadora, diminuindo a dívida.
-            if self.is_devolution():
-                debt.amount -= self.pallets_quantity
-            # Caso não seja uma devolução, a dívida é aumentada.
-            else:
-                debt.amount += self.pallets_quantity
+            # Se created for False, significa que a dívida já existia e atualiza a quantidade.
+            debt.update_debt(pallets_difference, is_devolution=self.is_devolution())
 
-            # Se for uma transferência entre filiais, chamará o método get_or_create para diminuir a dívida da filial
-            # de origem, visto que o valor devido agora é de responsabilidade da filial de destino,
-            # conforme é feito através das Notas Fiscais.
+            # Se for uma transferência, atualiza a dívida da filial de origem
             if self.is_transfer():
-                # atualiza a dívida da filial que está enviando os pallets.
                 debt_sending_branch, created = Debt.objects.get_or_create(
                     debtor=self.origin_company,
                     creditor=self.associated_shipper,
-                    defaults={
-                        "amount": 0
-                    },  # A quantidade padrão é 0 porque estamos reduzindo a dívida.
+                    defaults={"amount": 0},
                 )
+                debt_sending_branch.update_debt(pallets_difference)
 
-                # Reduz o valor da dívida conforme a quantidade de pallets enviados e persiste as alterações no banco.
-                debt_sending_branch.amount -= self.pallets_quantity
-                debt_sending_branch.save()
+        super().save(*args, **kwargs)
 
-            debt.save()
         # Se a opção voucher foi marcada, criará automaticamente um vale onde a empresa emissora é a empresa de destino
         # e a empresa recebedora é a filial responsável.
         if self.voucher:
@@ -249,7 +257,9 @@ class Voucher(models.Model):
     )
     pallets = models.IntegerField(null=False, blank=False, verbose_name="QUANTIDADE")
     issue_date = models.DateField(verbose_name="DATA DE EMISSÃO")
-    appointment_date = models.DateField(null=True, blank=True, verbose_name="DATA PREVISTA DE RECEBIMENTO")
+    appointment_date = models.DateField(
+        null=True, blank=True, verbose_name="DATA PREVISTA DE RECEBIMENTO"
+    )
     receipt_date = models.DateField(
         null=True, blank=True, verbose_name="DATA DE RECEBIMENTO"
     )
@@ -282,3 +292,11 @@ class Debt(models.Model):
         verbose_name="EMPRESA CREDORA",
     )
     amount = models.IntegerField(verbose_name="VALOR DA DÍVIDA")
+
+    def update_debt(self, amount, is_devolution=False):
+        # Atualiza a dívida com base na quantidade e no tipo de operação.
+        if is_devolution:
+            self.amount -= amount
+        else:
+            self.amount += amount
+        self.save()
