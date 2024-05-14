@@ -17,6 +17,7 @@
         <th scope="col">EMPRESA RECEBEDORA</th>
         <th scope="col">QUANTIDADE</th>
         <th scope="col">DATA DE EMISSÃO</th>
+        <th scope="col">DATA PREVISTA DE RECEBIMENTO</th>
         <th scope="col">DATA DE RECEBIMENTO</th>
         <th scope="col"></th>
       </tr>
@@ -30,8 +31,15 @@
           <td>{{ voucher.pallets }}</td>
           <td>{{ voucher.issue_date }}</td>
           <td>
-            {% if voucher.receipt_dat %}
-              voucher.receipt_dat
+            {% if voucher.appointment_date %}
+              {{ voucher.appointment_date }}
+            {% else %}
+              Não Agendado
+            {% endif %}
+          </td>
+          <td>
+            {% if voucher.receipt_date %}
+              {{ voucher.receipt_date }}
             {% else %}
               Não Recebido
             {% endif %}

@@ -249,14 +249,23 @@ class Voucher(models.Model):
     )
     pallets = models.IntegerField(null=False, blank=False, verbose_name="QUANTIDADE")
     issue_date = models.DateField(verbose_name="DATA DE EMISSÃO")
+    appointment_date = models.DateField(null=True, blank=True, verbose_name="DATA PREVISTA DE RECEBIMENTO")
     receipt_date = models.DateField(
         null=True, blank=True, verbose_name="DATA DE RECEBIMENTO"
     )
 
     def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Chama o método save padrão
 
+        # Verifica se o voucher foi recebido (se a data de recebimento está preenchida)
         if self.receipt_date:
-            self.recipient.pallets_storage += self.pallets
+            self.update_stock()
+
+    def update_stock(voucher):
+        if voucher.receipt_date:
+            recipient = voucher.recipient
+            recipient.pallets_storage += voucher.pallets
+            recipient.save()
 
 
 class Debt(models.Model):
