@@ -113,7 +113,7 @@ class Cargo(models.Model):
                     creditor=self.associated_shipper,
                     defaults={"amount": 0},
                 )
-                debt_sending_branch.update_debt(self.pallets_quantity)
+                debt_sending_branch.update_debt(-self.pallets_quantity)
 
         # Se is_new for False.
         if not is_new:
@@ -183,7 +183,7 @@ class Cargo(models.Model):
                     creditor=self.associated_shipper,
                     defaults={"amount": 0},
                 )
-                debt_sending_branch.update_debt(pallets_difference)
+                debt_sending_branch.update_debt(-pallets_difference)
 
         super().save(*args, **kwargs)
 
