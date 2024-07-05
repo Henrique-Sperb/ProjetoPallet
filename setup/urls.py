@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth import views as auth_views
+from authentication import views as auth_views
 from cargos.views import (
     CargoListView,
     CargoCreateView,
@@ -22,6 +24,9 @@ from companys.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),
     path(
         "company/<int:pk>/debts/", CompanyDebtListView.as_view(), name="company_debts"
     ),

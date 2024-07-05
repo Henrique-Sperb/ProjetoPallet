@@ -29,6 +29,7 @@ DJANGO_APPS = [
 MY_APPS = [
     "cargos.apps.CargosConfig",
     "companys.apps.CompanysConfig",
+    "authentication",
 ]
 
 THIRD_PARTY_APPS = [
@@ -128,3 +129,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGIN_REDIRECT_URL = 'cargo_list'
+
+LOGOUT_REDIRECT_URL = 'login'
